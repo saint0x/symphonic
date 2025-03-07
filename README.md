@@ -146,7 +146,7 @@ const result = await analyticsPipeline.run({ data: dataset });
 
 ## Documentation
 
-For detailed documentation and advanced usage, see [TESTUSAGE.md](./TESTUSAGE.md).
+For detailed documentation and advanced usage, see [USAGE.md](./USAGE.md).
 
 ## License
 

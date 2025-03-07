@@ -130,29 +130,23 @@ Pipelines define fixed sequences of operations with:
 - Performance optimization
 
 ```typescript
-const myPipeline = symphonic.pipeline.create({
-    name: "pipelineName",
-    description: "pipeline purpose",
+import { symphony } from 'symphonic';
+
+const researchPipeline = symphony.pipeline.create({
+    name: "researchPipeline",
+    description: "Processes research in a structured way",
     steps: [
         {
-            name: "step1",
-            tool: tool1,
-            description: "step purpose",
-            chained: 1,           // Execution order
-            target: "step2",      // Next step
-            expects: {            // Input type definitions
-                param1: "string"
-            },
-            outputs: {           // Output type definitions
-                result: "object"
-            }
-        },
+            name: "search",
+            tool: searchTool,
+            description: "Perform initial research",
+            chained: 1,
+            expects: { query: "string" },
+            outputs: { result: "object" }
+        }
         // Additional steps...
     ]
 });
-
-// Usage
-await myPipeline.run({ initialInput: value });
 ```
 
 Pipeline features:
@@ -162,35 +156,92 @@ Pipeline features:
 - Progress tracking
 - Type safety
 
-## Advanced Topics
+The SDK will validate this structure during initialization and provide clear error messages if any required components are missing or incorrectly structured.
 
-### Error Handling
-All components support structured error handling:
-- Tools return success/failure status
-- Agents can retry operations
-- Teams can redistribute tasks
-- Pipelines can attempt recovery
+## Project Structure
 
-### Logging
-Comprehensive logging available at all levels:
-- Tool execution
-- Agent decisions
-- Team communication
-- Pipeline progress
+Symphonic enforces an opinionated project structure to ensure consistency and enable powerful tooling capabilities. Your project must follow this structure:
 
-### Performance
-Built-in performance optimization:
-- Parallel execution where possible
-- Resource management
-- Caching
-- Load balancing
+```
+project/
+├── src/
+│   ├── agents/        # Agent definitions and behaviors
+│   │   └── *.ts      # Each agent in a separate file
+│   ├── tools/        # Tool implementations
+│   │   └── *.ts      # Each tool in a separate file
+│   ├── teams/        # Team compositions for agent collaboration
+│   │   └── *.ts      # Each team in a separate file
+│   ├── pipelines/    # Pipeline definitions for workflow automation
+│   │   └── *.ts      # Each pipeline in a separate file
+│   └── index.ts      # Main entry point and SDK initialization
+└── package.json      # Project configuration
+```
 
-### Security
-Security features include:
-- Input validation
-- Output sanitization
-- Access control
-- Audit logging
+### Required Components
+
+#### Agents (`src/agents/`)
+```typescript
+import { symphony } from 'symphonic';
+
+const researchAgent = symphony.agent.create({
+    name: "researchAgent",
+    description: "Conducts research tasks",
+    task: "perform research and analysis",
+    tools: ["webSearch", "documentAnalysis"],
+    llm: "gpt-4"
+});
+```
+
+#### Tools (`src/tools/`)
+```typescript
+import { symphony } from 'symphonic';
+
+const searchTool = symphony.tools.create({
+    name: "searchTool",
+    description: "Performs web searches",
+    inputs: ["query"],
+    handler: async (params) => {
+        // Tool logic here
+        return { success: true, result: "search results" };
+    }
+});
+```
+
+#### Teams (`src/teams/`)
+```typescript
+import { symphony } from 'symphonic';
+
+const researchTeam = symphony.team.create({
+    name: "researchTeam",
+    description: "Collaborates on research tasks",
+    agents: [researchAgent, writerAgent],
+    manager: true,
+    log: { inputs: true, outputs: true }
+});
+```
+
+#### Pipelines (`src/pipelines/`)
+```typescript
+import { symphony } from 'symphonic';
+
+const researchPipeline = symphony.pipeline.create({
+    name: "researchPipeline",
+    description: "Processes research in a structured way",
+    steps: [
+        {
+            name: "search",
+            tool: searchTool,
+            description: "Perform initial research",
+            chained: 1,
+            expects: { query: "string" },
+            outputs: { result: "object" }
+        }
+        // Additional steps...
+    ]
+});
+```
+
+The SDK will validate this structure during initialization and provide clear error messages if any required components are missing or incorrectly structured.
 
 ## Component Hierarchy
 
@@ -238,4 +289,4 @@ Each layer adds capabilities:
 
 
 
-Happy building!
+Happy Building!

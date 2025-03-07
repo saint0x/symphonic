@@ -34,11 +34,10 @@ For a more thorough overview of functionality and detailed examples, check out o
 
 ## Core Concepts
 
-### Tools: The Basic Building Blocks
-
-Tools are the fundamental units of work in Symphonic. They are pure functions that perform specific tasks with well-defined inputs and outputs.
-
+#### (`src/tools/`)
 ```typescript
+import { symphony } from 'symphonic';
+
 const myTool = symphony.tools.create({
     name: "toolName",          // Unique identifier
     description: "what it does", // Used by agents for tool selection
@@ -55,22 +54,17 @@ const myTool = symphony.tools.create({
 // Usage
 await myTool.run({ param1: value1, param2: value2 });
 ```
+  Tools are the fundamental units of work in Symphonic. They are pure functions that perform specific tasks with well-defined inputs and outputs.
+  
+  - Single responsibility: Each tool does one thing well
+  - Pure functions: Same inputs always produce same outputs
+  - Error handling: Always return `{ result, success }` objects
+  - Async by default: All handlers are async functions
 
-Tools follow these principles:
-- Single responsibility: Each tool does one thing well
-- Pure functions: Same inputs always produce same outputs
-- Error handling: Always return `{ result, success }` objects
-- Async by default: All handlers are async functions
-
-### Agents: Intelligent Tool Users
-
-Agents wrap tools with AI capabilities, using LLMs to:
-- Select appropriate tools for tasks
-- Process inputs and outputs
-- Handle error conditions
-- Make decisions based on context
-
+#### (`src/agents/`)
 ```typescript
+import { symphony } from 'symphonic';
+
 const myAgent = symphony.agent.create({
     name: "agentName",
     description: "agent purpose",
@@ -82,28 +76,23 @@ const myAgent = symphony.agent.create({
 // Usage
 await myAgent.run("natural language task description");
 ```
+  Agents wrap tools with AI capabilities, using LLMs to:
+  
+  - Natural language interface
+  - Automatic tool selection
+  - Context awareness
+  - Error recovery
+  - Task decomposition
 
-Agent features:
-- Natural language interface
-- Automatic tool selection
-- Context awareness
-- Error recovery
-- Task decomposition
-
-### Teams: Coordinated Agent Groups
-
-Teams organize multiple agents into collaborative units with:
-- Shared context
-- Coordinated workflows
-- Managed communication
-- Centralized logging
-
+#### (`src/teams/`)
 ```typescript
+import { symphony } from 'symphonic';
+
 const myTeam = symphony.team.create({
     name: "teamName",
     description: "team purpose",
     agents: [agent1, agent2],
-    manager: true,           // Enable team coordination -- if false, all agents return their own data 
+    manager: true,           // Enable team coordination
     log: {                   // Logging configuration
         inputs: true,
         outputs: true
@@ -113,48 +102,48 @@ const myTeam = symphony.team.create({
 // Usage
 await myTeam.run("complex task description");
 ```
+  Teams organize multiple agents into collaborative units with:
+  
+  - Task distribution
+  - Resource sharing
+  - Progress monitoring
+  - Error propagation
+  - Result aggregation
 
-Team capabilities:
-- Task distribution
-- Resource sharing
-- Progress monitoring
-- Error propagation
-- Result aggregation
-
-### Pipelines: Fixed Workflows
-
-Pipelines define fixed sequences of operations with:
-- Explicit data flow
-- Type checking
-- Chain validation
-- Performance optimization
-
+#### (`src/pipelines/`)
 ```typescript
 import { symphony } from 'symphonic';
 
-const researchPipeline = symphony.pipeline.create({
-    name: "researchPipeline",
-    description: "Processes research in a structured way",
+const myPipeline = symphony.pipeline.create({
+    name: "pipelineName",
+    description: "pipeline purpose",
     steps: [
         {
-            name: "search",
-            tool: searchTool,
-            description: "Perform initial research",
-            chained: 1,
-            expects: { query: "string" },
-            outputs: { result: "object" }
+            name: "step1",
+            tool: tool1,
+            description: "step purpose",
+            chained: 1,           // Step 1 in execution order
+            expects: {            // Input type definitions
+                param1: "string"
+            },
+            outputs: {           // Output type definitions
+                result: "object"
+            }
         }
         // Additional steps...
     ]
 });
-```
 
-Pipeline features:
-- Static validation
-- Performance optimization
-- Error recovery
-- Progress tracking
-- Type safety
+// Usage
+await myPipeline.run({ initialInput: value });
+```
+  Pipelines define fixed sequences of operations with:
+  
+  - Static validation
+  - Performance optimization
+  - Error recovery
+  - Progress tracking
+  - Type safety
 
 The SDK will validate this structure during initialization and provide clear error messages if any required components are missing or incorrectly structured.
 
@@ -177,71 +166,6 @@ project/
 └── package.json      # Project configuration
 ```
 
-### Required Components
-
-#### Agents (`src/agents/`)
-```typescript
-import { symphony } from 'symphonic';
-
-const researchAgent = symphony.agent.create({
-    name: "researchAgent",
-    description: "Conducts research tasks",
-    task: "perform research and analysis",
-    tools: ["webSearch", "documentAnalysis"],
-    llm: "gpt-4"
-});
-```
-
-#### Tools (`src/tools/`)
-```typescript
-import { symphony } from 'symphonic';
-
-const searchTool = symphony.tools.create({
-    name: "searchTool",
-    description: "Performs web searches",
-    inputs: ["query"],
-    handler: async (params) => {
-        // Tool logic here
-        return { success: true, result: "search results" };
-    }
-});
-```
-
-#### Teams (`src/teams/`)
-```typescript
-import { symphony } from 'symphonic';
-
-const researchTeam = symphony.team.create({
-    name: "researchTeam",
-    description: "Collaborates on research tasks",
-    agents: [researchAgent, writerAgent],
-    manager: true,
-    log: { inputs: true, outputs: true }
-});
-```
-
-#### Pipelines (`src/pipelines/`)
-```typescript
-import { symphony } from 'symphonic';
-
-const researchPipeline = symphony.pipeline.create({
-    name: "researchPipeline",
-    description: "Processes research in a structured way",
-    steps: [
-        {
-            name: "search",
-            tool: searchTool,
-            description: "Perform initial research",
-            chained: 1,
-            expects: { query: "string" },
-            outputs: { result: "object" }
-        }
-        // Additional steps...
-    ]
-});
-```
-
-The SDK will validate this structure during initialization and provide clear error messages if any required components are missing or incorrectly structured.
 
 ## Component Hierarchy
 
@@ -288,5 +212,6 @@ Each layer adds capabilities:
 - Monitor performance
 
 
+<br/>
 
-Happy Building!
+**Happy Building!**

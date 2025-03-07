@@ -2,216 +2,152 @@
 
 Symphonic is the easiest way to build self-learning tools, agents, teams, and pipelines in minutes.
 
-## Getting Started
 
-1. Install the SDK:
+## Installation
+
 ```bash
 npm install symphonic
+# or
+yarn add symphonic
 # or
 bun add symphonic
 ```
 
-2. Import core functionality:
+## Quick Start
+
 ```typescript
 import { symphony } from "symphonic";
-```
 
-3. Create your first tool:
-```typescript
-const myTool = symphony.tools.create({
-    name: "example",
-    description: "does something useful",
-    inputs: ["data"],
-    handler: async (data) => {
-        return { result: data, success: true };
-    }
-});
-```
-
-4. Build up from there!
-
-For a more thorough overview of functionality and detailed examples, check out our [Usage Guide](./USAGE.md).
-
-## Core Concepts
-
-#### (`src/tools/`)
-```typescript
-import { symphony } from 'symphonic';
-
-const myTool = symphony.tools.create({
-    name: "toolName",          // Unique identifier
-    description: "what it does", // Used by agents for tool selection
-    inputs: ["param1", "param2"], // Expected input parameters
-    handler: async (param1, param2) => {
-        // Your logic here
-        return {
-            result: returnedOutput,  // The function's expected output
-            success: true          // Operation status
-        };
+// Create a tool
+const searchTool = symphony.tools.create({
+    name: "search",
+    description: "Search for information",
+    inputs: ["query"],
+    handler: async (query) => {
+        // Implementation
+        return { result: searchResults, success: true };
     }
 });
 
-// Usage
-await myTool.run({ param1: value1, param2: value2 });
-```
-  Tools are the fundamental units of work in Symphonic. They are pure functions that perform specific tasks with well-defined inputs and outputs.
-  
-  - Single responsibility: Each tool does one thing well
-  - Pure functions: Same inputs always produce same outputs
-  - Error handling: Always return `{ result, success }` objects
-  - Async by default: All handlers are async functions
-
-#### (`src/agents/`)
-```typescript
-import { symphony } from 'symphonic';
-
-const myAgent = symphony.agent.create({
-    name: "agentName",
-    description: "agent purpose",
-    task: "specific task description",
-    tools: [tool1, tool2],    // Tools this agent can use
-    llm: "gpt-4"              // Language model to use
+// Create an agent
+const researcher = symphony.agent.create({
+    name: "researcher",
+    description: "Research assistant",
+    task: "Find and analyze information",
+    tools: [searchTool],
+    llm: "gpt-4"
 });
 
-// Usage
-await myAgent.run("natural language task description");
+// Use the agent
+const result = await researcher.run("Research quantum computing advances in 2024");
 ```
-  Agents wrap tools with AI capabilities, using LLMs to:
-  
-  - Natural language interface
-  - Automatic tool selection
-  - Context awareness
-  - Error recovery
-  - Task decomposition
 
-#### (`src/teams/`)
-```typescript
-import { symphony } from 'symphonic';
+## Core Components
 
-const myTeam = symphony.team.create({
-    name: "teamName",
-    description: "team purpose",
-    agents: [agent1, agent2],
-    manager: true,           // Enable team coordination
-    log: {                   // Logging configuration
-        inputs: true,
-        outputs: true
-    }
-});
+### Tools
+- Pure functions with defined i/o
+- Error handling and metrics
+- Async by default
+- Chainable operations
 
-// Usage
-await myTeam.run("complex task description");
-```
-  Teams organize multiple agents into collaborative units with:
-  
-  - Task distribution
-  - Resource sharing
-  - Progress monitoring
-  - Error propagation
-  - Result aggregation
+### Agents
+- Decision making
+- Tool orchestration
+- Memory management
+- Error recovery
 
-#### (`src/pipelines/`)
-```typescript
-import { symphony } from 'symphonic';
+### Teams
+- Agent collaboration
+- Task distribution
+- Progress tracking
+- Resource sharing
 
-const myPipeline = symphony.pipeline.create({
-    name: "pipelineName",
-    description: "pipeline purpose",
-    steps: [
-        {
-            name: "step1",
-            tool: tool1,
-            description: "step purpose",
-            chained: 1,           // Step 1 in execution order
-            expects: {            // Input type definitions
-                param1: "string"
-            },
-            outputs: {           // Output type definitions
-                result: "object"
-            }
-        }
-        // Additional steps...
-    ]
-});
+### Pipelines
+- Sequential workflows
+- Type validation
+- Performance monitoring
+- Error propagation
 
-// Usage
-await myPipeline.run({ initialInput: value });
-```
-  Pipelines define fixed sequences of operations with:
-  
-  - Static validation
-  - Performance optimization
-  - Error recovery
-  - Progress tracking
-  - Type safety
+## Features
 
-The SDK will validate this structure during initialization and provide clear error messages if any required components are missing or incorrectly structured.
+- **Memory System**: Short-term, long-term, and episodic memory for agents
+- **Metrics Tracking**: Built-in performance and usage metrics
+- **Type Safety**: Full TypeScript support
+- **Error Handling**: Comprehensive error management
+- **Streaming**: Support for streaming responses
+- **Caching**: Intelligent caching system
 
 ## Project Structure
-
-Symphonic enforces an opinionated project structure to ensure consistency and enable powerful tooling capabilities. Your project must follow this structure:
 
 ```
 project/
 ├── src/
-│   ├── agents/        # Agent definitions and behaviors
-│   │   └── *.ts      # Each agent in a separate file
-│   ├── tools/        # Tool implementations
-│   │   └── *.ts      # Each tool in a separate file
-│   ├── teams/        # Team compositions for agent collaboration
-│   │   └── *.ts      # Each team in a separate file
-│   ├── pipelines/    # Pipeline definitions for workflow automation
-│   │   └── *.ts      # Each pipeline in a separate file
-│   └── index.ts      # Main entry point and SDK initialization
-└── package.json      # Project configuration
+│   ├── agents/     # Agent definitions
+│   ├── tools/      # Tool implementations
+│   ├── teams/      # Team configurations
+│   ├── pipelines/  # Pipeline definitions
+│   └── index.ts    # Main entry point
+└── package.json
 ```
 
+## Example
 
-## Component Hierarchy
+```typescript
+import { symphony } from "symphonic";
 
-The components form a natural hierarchy:
-1. Tools: Basic operations
-2. Agents: Intelligent tool users
-3. Teams: Coordinated agent groups
-4. Pipelines: Fixed workflows
+// Create a tool
+const analysisTool = symphony.tools.create({
+    name: "analyze",
+    description: "Analyze data",
+    inputs: ["data"],
+    handler: async (data) => {
+        const analysis = await performAnalysis(data);
+        return {
+            success: true,
+            result: analysis
+        };
+    }
+});
 
-Each layer adds capabilities:
-- Tools → Pure functions
-- Agents → Intelligence
-- Teams → Coordination
-- Pipelines → Structure
+// Create an agent
+const analyst = symphony.agent.create({
+    name: "analyst",
+    description: "Data analyst",
+    task: "Analyze complex datasets",
+    tools: [analysisTool],
+    llm: "gpt-4"
+});
 
-## Best Practices
+// Create a team
+const analyticsTeam = symphony.team.create({
+    name: "analytics",
+    description: "Analytics team",
+    agents: [analyst],
+    manager: true
+});
 
-### Tool Design
-- Keep tools simple and focused
-- Use clear naming conventions
-- Document inputs and outputs
-- Handle errors gracefully
-- Include type definitions
+// Create a pipeline
+const analyticsPipeline = symphony.pipeline.create({
+    name: "analysis-pipeline",
+    description: "Data analysis workflow",
+    steps: [
+        {
+            name: "analyze",
+            tool: analysisTool,
+            description: "Perform analysis",
+            chained: 1
+        }
+    ]
+});
 
-### Agent Configuration
-- Provide clear task descriptions
-- Choose appropriate LLMs
-- Limit tool access appropriately
-- Configure logging
-- Handle timeouts
+// Use the pipeline
+const result = await analyticsPipeline.run({ data: dataset });
+```
 
-### Team Organization
-- Group related agents
-- Enable appropriate logging
-- Configure management level
-- Set communication patterns
-- Define error policies
+## Documentation
 
-### Pipeline Construction
-- Validate data flow
-- Define types clearly
-- Order steps logically
-- Handle edge cases
-- Monitor performance
+For detailed documentation and advanced usage, see [TESTUSAGE.md](./TESTUSAGE.md).
 
+## License
 
-<br/>
-
-**Happy Building!**
+MIT 
